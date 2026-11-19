@@ -48,8 +48,16 @@
     document.querySelectorAll("[data-page],[data-suite-module]").forEach(x=>x.classList.toggle("active",x.dataset.suiteModule===id));
     $("#pageTitle").textContent=m[1];
     if(!db){root.innerHTML='<div class="panel"><h3>'+esc(m[1])+'</h3><p>මෙම module එක සක්‍රීය කිරීමට Supabase credentials සහ 002_commercial_suite.sql migration එක අවශ්‍යයි.</p></div>';return}
-    root.innerHTML='<div class="panel"><div class="suite-panel-head"><div><h3>'+esc(m[1])+'</h3><p>'+esc(m[4])+'</p></div><button class="btn light" id="suiteRefresh">Refresh</button></div><form id="suiteAdd" class="suite-form">'+m[3].map(field).join("")+'<button class="btn primary">Save Record</button></form><div class="suite-table-wrap"><table><thead><tr>'+m[3].map(k=>'<th>'+esc(label(k))+'</th>').join("")+'<th>Action</th></tr></thead><tbody id="suiteRows"><tr><td colspan="'+(m[3].length+1)+'">Loading…</td></tr></tbody></table></div></div>';
+    root.innerHTML='<div class="panel"><div class="suite-panel-head"><div><h3>'+esc(m[1])+'</h3><p>'+esc(m[4])+'</p></div><div><button class="btn light" id="suiteRefresh">Refresh</button> <button class="btn light" id="suiteExport">Export CSV</button></div></div><form id="suiteAdd" class="suite-form">'+m[3].map(field).join("")+'<button class="btn primary">Save Record</button></form><div class="suite-table-wrap"><table><thead><tr>'+m[3].map(k=>'<th>'+esc(label(k))+'</th>').join("")+'<th>Action</th></tr></thead><tbody id="suiteRows"><tr><td colspan="'+(m[3].length+1)+'">Loading…</td></tr></tbody></table></div></div>';
     const load=async()=>{const {data,error}=await db.from(m[2]).select("*").order("created_at",{ascending:false}).limit(200);const body=$("#suiteRows");if(error){body.innerHTML='<tr><td colspan="'+(m[3].length+1)+'">'+esc(error.message)+'</td></tr>';return}body.innerHTML=(data||[]).map(r=>'<tr>'+m[3].map(k=>'<td>'+esc(r[k])+'</td>').join("")+'<td><button class="suite-delete" data-id="'+esc(r.id)+'">Delete</button></td></tr>').join("")||'<tr><td colspan="'+(m[3].length+1)+'">No records yet.</td></tr>';body.querySelectorAll(".suite-delete").forEach(b=>b.onclick=async()=>{if(confirm("Delete this record?")){const {error}=await db.from(m[2]).delete().eq("id",b.dataset.id);if(error)alert(error.message);else load()}})};
+    $("#suiteExport").onclick=async()=>{
+      const {data,error}=await db.from(m[2]).select("*").order("created_at",{ascending:false}).limit(5000);
+      if(error){alert(error.message);return}
+      const columns=m[3],cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+      const csv=[columns.join(","),...(data||[]).map(row=>columns.map(k=>cell(row[k])).join(","))].join("\\r\\n");
+      const url=URL.createObjectURL(new Blob(["\\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));
+      const a=document.createElement("a");a.href=url;a.download=m[0]+"-export.csv";a.click();URL.revokeObjectURL(url);
+    };
     $("#suiteRefresh").onclick=load;
     $("#suiteAdd").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));for(const k of Object.keys(v)){if(v[k]==="")delete v[k];else if(numericFields.has(k))v[k]=Number(v[k]);else if(booleanFields.has(k))v[k]=v[k]==="true"}const {error}=await db.from(m[2]).insert(v);if(error)alert(error.message);else{e.target.reset();load()}};load();
   }
