@@ -41,6 +41,9 @@ jobs:
           test -s 008_certificate_access.sql
           test -s certificates.js
           test -s admin-tools.js
+          test -s sw.js
+          test -s manifest.webmanifest
+          test -s icon.svg
           test -s notifications.js
           test -s netlify/functions/send-notification.js
           test -s netlify/functions/payhere-checkout.js
