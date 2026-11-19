@@ -96,20 +96,12 @@ This branch adds a commercial-suite public landing section and a first set of te
 ### Apply the extension migration
 After running `supabase-schema.sql`, run `002_commercial_suite.sql` in Supabase SQL Editor. Then deploy the updated repository branch. The new teacher modules appear in the portal when a teacher is signed in.
 
-### Important implementation status
-The extension provides database-backed teacher CRUD for the listed records and the public site sections. It does **not** yet implement every end-user workflow end-to-end: for example payment gateway checkout/webhooks, SMS/email/WhatsApp provider delivery, QR scanning, quiz-taking/auto-marking UI, file storage upload, parent self-service onboarding, calendar integrations, and production-grade PDF/Excel reporting still require dedicated implementation and provider credentials. Do not market these as active until completed and tested.
+### Implementation status and external requirements
+This branch now includes working code paths for the core flows: teacher CRUD, parent/student account linking, published learner quizzes with server-side scoring, private homework uploads and marking, short-lived QR attendance tokens, invoices, PayHere checkout/webhook handlers, provider-backed email/SMS/WhatsApp sending, certificate printing, CSV export, audit screens and a PWA shell.
 
-Use Supabase Storage buckets and signed URLs for private student files. Configure payment providers only through secure server-side functions; never put secret keys in browser code. Review all RLS policies with test student, parent and teacher accounts before accepting real student records.
+These workflows are **not yet production-certified**. They require the listed SQL migrations, correct RLS policies, a customer-owned Supabase project, Netlify functions and environment variables, provider merchant/sender accounts, sandbox testing and real-device acceptance tests. PayHere payments cannot run without an approved merchant account. Notifications cannot be delivered until Resend/Twilio/WhatsApp Cloud credentials and sender/consent requirements are configured. Browser print-to-PDF is used for certificates; there is no server-generated PDF service. Calendar sync, automated recurring reminders, advanced analytics, and full multi-school SaaS tenant isolation are not included.
 
-
-## Selling and handing over this website
-
-This codebase is currently a **dedicated single-teacher / single-institution website template**. For each customer, create a separate customer-owned GitHub repository (or transfer repository ownership), Netlify site, and Supabase project. Do not use one shared database for unrelated teachers: tenant isolation has not been implemented.
-
-Before describing it as production-ready or accepting a final handover, complete [SECURITY.md](SECURITY.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). In particular, configure the customer's own Supabase project, test RLS with separate teacher/student/parent accounts, configure email/auth settings, and verify the production deployment.
-
-The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checkout and webhooks, automated SMS/email/WhatsApp delivery, quiz-taking and auto-marking, QR attendance, private file uploads, parent self-service onboarding, and automated certificate/report generation are not implemented end-to-end. Quote these as future phases, not delivered features. A real customer installation also needs the teacher's verified content, prices, timetable, contact information, domain, and privacy notice.
-
+Do not claim any external integration is live until the customer's own credentials are configured and a test delivery/payment is verified. Never put service-role keys or provider secrets in browser code.
 
 ## Workflow capabilities added in this branch
 - **Quizzes:** teachers create quiz and question records; learners see only published quizzes for their grade. Answer keys are returned only to server-side SQL functions, and scoring is calculated in the database.
