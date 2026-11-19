@@ -37,7 +37,7 @@ exports.handler=async event=>{
     if(log.status===409){skipped++;continue}if(!log.ok){failed++;continue}
     try{
      const providerId=await send(channel,student,invoice,env);
-     await fetch(url+"/rest/v1/reminder_logs?invoice_id=eq."+encodeURIComponent(invoice.id)+"&channel=eq."+channel+"&reminder_date=eq."+today,{method:"PATCH",headers:{...headers(key),Prefer:"return=minimal"},body:JSON.stringify({status:"sent",error_message:providerId?"provider:"+providerId:null})});
+     await fetch(url+"/rest/v1/reminder_logs?invoice_id=eq."+encodeURIComponent(invoice.id)+"&channel=eq."+channel+"&reminder_date=eq."+today,{method:"PATCH",headers:{...headers(key),Prefer:"return=minimal"},body:JSON.stringify({status:"sent",provider_message_id:providerId,error_message:null})});
      sent++;
     }catch(err){
      await fetch(url+"/rest/v1/reminder_logs?invoice_id=eq."+encodeURIComponent(invoice.id)+"&channel=eq."+channel+"&reminder_date=eq."+today,{method:"PATCH",headers:{...headers(key),Prefer:"return=minimal"},body:JSON.stringify({status:"failed",error_message:String(err.message).slice(0,240)})});
