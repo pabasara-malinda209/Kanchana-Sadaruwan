@@ -118,7 +118,7 @@ The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checko
 - **Public updates:** published events and testimonials are loaded from Supabase into the public site.
 - **Certificates:** teachers issue and print certificates; students and linked parents can view and print them (browser print-to-PDF).
 - **Financial reporting:** dashboard totals recorded income and expenses and calculates net cash.
-- **Audit trail:** selected student, payment and attendance changes are logged; audit records are read-only to teacher/admin accounts.
+- **Audit trail:** selected student, payment and attendance changes are logged and visible in a read-only admin screen. A live system overview shows core record counts.
 
 ## Before you sell
 This is still a customer-installable template, not a shared SaaS product. Every teacher/customer must have a separate Supabase project and Netlify site. The payment integration requires a PayHere merchant account; automated email/SMS/WhatsApp delivery still needs provider-specific configuration and a sending workflow. Run every migration in a disposable Supabase project and test teacher, student, parent and signed-out sessions before real data is used.
