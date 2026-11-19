@@ -7,7 +7,8 @@ Use this for each customer installation. Keep customer credentials in the custom
 - [ ] Confirm the customer owns the Netlify, GitHub, domain, and Supabase accounts (or has documented admin access).
 - [ ] Confirm this is a dedicated single-school installation, not a shared multi-school SaaS subscription.
 - [ ] Demonstrate the public website and teacher dashboard using test data.
-- [ ] Explain that payment gateway, automated messaging, quiz engine, QR attendance, parent onboarding, and file uploads are not included as working end-to-end features yet.
+- [ ] Demonstrate quiz scoring, private homework upload/review, QR attendance, invoices, certificate printing, exports, and portal account linking with test accounts.
+- [ ] Test PayHere sandbox checkout/webhook and each configured email/SMS/WhatsApp provider. Do not enable live payments until merchant approval and successful reconciliation.
 
 ## Customer configuration
 - [ ] Create a dedicated Supabase project in the customer's account.
