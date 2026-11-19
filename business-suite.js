@@ -37,7 +37,7 @@
     return '<label>'+l+'<input name="'+esc(k)+'" type="'+type+'" '+(numericFields.has(k)?'step="any" min="0"':'')+'></label>';
   }
   function inject(){
-    const nav=$("#sideNav"); if(!nav||!$("#portal")||$("#portal").hidden||!nav.dataset.suiteReady||nav.dataset.suiteRole!=="teacher")return;
+    const nav=$("#sideNav"); if(!nav||!$("#portal")||$("#portal").hidden||!nav.dataset.suiteReady||!["teacher","admin"].includes(nav.dataset.suiteRole))return;
     if(nav.querySelector('[data-suite-menu]'))return;
     const head=document.createElement("div");head.className="suite-nav-heading";head.textContent="BUSINESS SUITE";head.dataset.suiteMenu="1";nav.append(head);
     modules.forEach(m=>{const b=document.createElement("button");b.type="button";b.textContent=m[1];b.dataset.suiteModule=m[0];b.onclick=()=>render(m[0]);nav.append(b)});
