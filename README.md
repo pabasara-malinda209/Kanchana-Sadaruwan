@@ -42,3 +42,23 @@ Connect this GitHub repository to Netlify or GitHub Pages. Publish the repositor
 - File upload storage buckets and a full student invitation workflow are not provisioned automatically. For now, add resource links in the teacher portal; configure Supabase Storage before accepting private uploads.
 - Verify teacher identity, class fees, schedule, and actual lesson materials before public launch.
 - Never store API secrets, service_role keys, passwords, marks, or parent contact lists in public GitHub files.
+
+## Commercial platform extension (branch: commercial-platform-suite)
+
+This branch adds a commercial-suite public landing section and a first set of teacher-only management modules:
+- CRM leads and follow-ups
+- Batches and class sessions
+- Staff and expenses
+- Assignments and submissions
+- Quiz and online lesson records
+- Messages, events and testimonials
+- Campaigns, coupons and referrals
+- Certificates, parent/student links and website settings
+
+### Apply the extension migration
+After running `supabase-schema.sql`, run `002_commercial_suite.sql` in Supabase SQL Editor. Then deploy the updated repository branch. The new teacher modules appear in the portal when a teacher is signed in.
+
+### Important implementation status
+The extension provides database-backed teacher CRUD for the listed records and the public site sections. It does **not** yet implement every end-user workflow end-to-end: for example payment gateway checkout/webhooks, SMS/email/WhatsApp provider delivery, QR scanning, quiz-taking/auto-marking UI, file storage upload, parent self-service onboarding, calendar integrations, and production-grade PDF/Excel reporting still require dedicated implementation and provider credentials. Do not market these as active until completed and tested.
+
+Use Supabase Storage buckets and signed URLs for private student files. Configure payment providers only through secure server-side functions; never put secret keys in browser code. Review all RLS policies with test student, parent and teacher accounts before accepting real student records.
