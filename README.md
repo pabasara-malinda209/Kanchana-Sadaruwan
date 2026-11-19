@@ -47,6 +47,8 @@ After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
 2. `003_workflows_security.sql`
 3. `004_payhere_payments.sql`
 4. `005_homework_uploads.sql`
+5. `006_notifications.sql`
+6. `007_multi_admin.sql`
 
 These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
 
@@ -63,7 +65,12 @@ Deploy on Netlify and configure these **Netlify environment variables** (never a
 
 The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature before marking the invoice paid. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
 
-### 8. Deploy
+### 8. Notifications and additional administrators
+For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
+
+To add another trusted administrator, create their account, verify identity, then run `update public.profiles set role='admin' where id=(select id from auth.users where email='ADMIN_EMAIL_HERE');`. Never let a public sign-up choose the admin role.
+
+### 9. Deploy
 Connect this GitHub repository to Netlify. Publish the repository root; Netlify detects functions under `netlify/functions`. Set the production branch intentionally and configure the environment variables above. Re-deploy after updating files.
 
 ## Notes / current limitations
