@@ -30,9 +30,12 @@
  }
  async function renderQuizzes(){
   panel("Online Quizzes",'<div class="empty">Loading available quizzes…</div>');
+  const ses=await session();const {data:student,error:studentError}=await db.from("students").select("grade").eq("auth_user_id",ses.user.id).maybeSingle();
+  const root=$("#dashboardContent .panel");if(studentError||!student){root.innerHTML+='<p>Student profile is not linked.</p>';return}
   const {data,error}=await db.from("quizzes").select("id,title,grade,subject,opens_at,closes_at,total_marks").eq("published",true).order("created_at",{ascending:false});
-  const root=$("#dashboardContent .panel");if(error){root.innerHTML+='<p>'+esc(error.message)+'</p>';return}
-  root.innerHTML='<h3>Available quizzes</h3>'+(data||[]).map(q=>'<button class="btn light lms-quiz" data-id="'+esc(q.id)+'">'+esc(q.title)+' · '+esc(q.subject||"")+'</button>').join("")||'<p>No published quizzes.</p>';
+  if(error){root.innerHTML+='<p>'+esc(error.message)+'</p>';return}
+  const available=(data||[]).filter(q=>q.grade==null||Number(q.grade)===Number(student.grade));
+  root.innerHTML='<h3>Available quizzes</h3>'+(available.map(q=>'<button class="btn light lms-quiz" data-id="'+esc(q.id)+'">'+esc(q.title)+' · '+esc(q.subject||"")+'</button>').join("")||'<p>No published quizzes for your grade.</p>');
   root.querySelectorAll(".lms-quiz").forEach(b=>b.onclick=()=>takeQuiz(b.dataset.id));
  }
  async function takeQuiz(id){
