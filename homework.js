@@ -9,7 +9,7 @@
  function addLinks(){
   const nav=$("#sideNav"),portal=$("#portal");if(!nav||!portal||portal.hidden)return;
   const role=nav.dataset.suiteRole||"student";
-  const links=role==="teacher"?[["review-homework","Review Homework"]]:role==="parent"?[["child-homework","Children's Homework"]]:[["my-homework","Homework"]];
+  const links=["teacher","admin"].includes(role)?[["review-homework","Review Homework"]]:role==="parent"?[["child-homework","Children's Homework"]]:[["my-homework","Homework"]];
   links.forEach(([id,label])=>{if(nav.querySelector('[data-homework-page="'+id+'"]'))return;const b=document.createElement("button");b.type="button";b.dataset.homeworkPage=id;b.textContent=label;nav.append(b)});
  }
  async function studentHomework(){
