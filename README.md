@@ -49,6 +49,7 @@ After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
 4. `005_homework_uploads.sql`
 5. `006_notifications.sql`
 6. `007_multi_admin.sql`
+7. `008_certificate_access.sql`
 
 These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
 
@@ -66,7 +67,7 @@ Deploy on Netlify and configure these **Netlify environment variables** (never a
 The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature before marking the invoice paid. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
 
 ### 8. Notifications and additional administrators
-For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
+For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Configure `RESEND_API_KEY` and `EMAIL_FROM` for email; `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for SMS; and `WHATSAPP_ACCESS_TOKEN` plus `WHATSAPP_PHONE_NUMBER_ID` for WhatsApp Cloud API. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
 
 To add another trusted administrator, create their account, verify identity, then run `update public.profiles set role='admin' where id=(select id from auth.users where email='ADMIN_EMAIL_HERE');`. Never let a public sign-up choose the admin role.
 
@@ -115,7 +116,9 @@ The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checko
 - **Homework:** students upload private work to the `student-private` bucket; teachers can open short-lived signed links, mark work and give feedback. Parents can view linked-child submission status.
 - **Invoices and payments:** teachers create invoices; learners/parents see only invoices allowed by RLS. PayHere checkout and webhook functions are included but require the merchant credentials and sandbox validation above.
 - **Public updates:** published events and testimonials are loaded from Supabase into the public site.
-- **Audit trail:** selected student, payment and attendance changes are logged; the teacher dashboard can read the log only if the corresponding module is implemented.
+- **Certificates:** teachers issue and print certificates; students and linked parents can view and print them (browser print-to-PDF).
+- **Financial reporting:** dashboard totals recorded income and expenses and calculates net cash.
+- **Audit trail:** selected student, payment and attendance changes are logged; audit records are read-only to teacher/admin accounts.
 
 ## Before you sell
 This is still a customer-installable template, not a shared SaaS product. Every teacher/customer must have a separate Supabase project and Netlify site. The payment integration requires a PayHere merchant account; automated email/SMS/WhatsApp delivery still needs provider-specific configuration and a sending workflow. Run every migration in a disposable Supabase project and test teacher, student, parent and signed-out sessions before real data is used.
