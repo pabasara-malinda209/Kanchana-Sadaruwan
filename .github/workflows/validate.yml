@@ -28,6 +28,8 @@ jobs:
           node --check admin-tools.js
           node --check portal-accounts.js
           node --check id-cards.js
+          node --check calendar.js
+          node --check netlify/functions/daily-fee-reminders.js
           node --check public-feed.js
           node --check pwa.js
           node --check netlify/functions/payhere-checkout.js
@@ -48,6 +50,9 @@ jobs:
           test -s 008_certificate_access.sql
           test -s 009_portal_account_linking.sql
           test -s 010_payhere_atomic_webhook.sql
+          test -s 011_scheduled_reminders.sql
+          test -s calendar.js
+          test -s netlify/functions/daily-fee-reminders.js
           test -s netlify/functions/payhere-checkout.js
           test -s netlify/functions/payhere-notify.js
           test -s netlify/functions/send-notification.js
