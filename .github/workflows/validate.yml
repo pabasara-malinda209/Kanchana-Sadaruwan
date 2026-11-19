@@ -39,6 +39,8 @@ jobs:
           test -s 006_notifications.sql
           test -s 007_multi_admin.sql
           test -s 008_certificate_access.sql
+          test -s 009_portal_account_linking.sql
+          test -s portal-accounts.js
           test -s certificates.js
           test -s admin-tools.js
           test -s sw.js
