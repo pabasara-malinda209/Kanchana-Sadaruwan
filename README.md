@@ -119,6 +119,7 @@ Do not claim any external integration is live until the customer's own credentia
 - **Fee reminders:** a daily Netlify scheduled function sends reminders one day before unpaid invoices, only through channels explicitly opted into on the student record.
 - **Financial reporting:** dashboard totals recorded income and expenses and calculates net cash.
 - **PWA:** installable application manifest and a cached static app shell for quicker repeat loads. Authenticated workflows still require an internet connection.
+- **Legal templates:** editable privacy notice and terms pages; customer must replace placeholders and obtain suitable legal review before collecting real student data.
 - **Exports:** teacher business-suite tables can be exported as CSV.
 - **Audit trail:** selected student, payment and attendance changes are logged and visible in a read-only admin screen. A live system overview shows core record counts.
 
