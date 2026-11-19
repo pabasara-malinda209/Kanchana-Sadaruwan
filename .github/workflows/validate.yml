@@ -20,9 +20,19 @@ jobs:
           node --check app.js
           node --check business-suite.js
           node --check config.js
+          node --check lms.js
+          node --check homework.js
+          node --check public-feed.js
+          node --check netlify/functions/payhere-checkout.js
+          node --check netlify/functions/payhere-notify.js
       - name: Check required deployment files
         run: |
           test -s index.html
           test -s style.css
           test -s supabase-schema.sql
           test -s 002_commercial_suite.sql
+          test -s 003_workflows_security.sql
+          test -s 004_payhere_payments.sql
+          test -s 005_homework_uploads.sql
+          test -s netlify/functions/payhere-checkout.js
+          test -s netlify/functions/payhere-notify.js
