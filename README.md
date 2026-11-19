@@ -32,14 +32,14 @@ The GitHub repository cannot create a private Supabase project or securely confi
 4. Sign out and sign in again. The teacher portal will show management sections.
 
 ### 4. Student accounts
-Teacher creates student records in the protected database. To link a student login, create their Auth account, then set the matching `students.auth_user_id` and `profiles.student_id` in Supabase. Do not share teacher login details with students.
+Teacher creates student records in the protected database. Ask the student to create an account, then use **Link Portal Accounts** in the teacher portal to link the student's email to the student record. Do not share teacher login details with students.
 
-### 5. Parent portal setup
-1. Ask the parent to create an account using the website login form.
-2. In Supabase, promote that account to the `parent` role:
-   `update public.profiles set role='parent' where id=(select id from auth.users where email='PARENT_EMAIL_HERE');`
-3. In the teacher portal, use **Parent Links** to connect the parent's Auth user UUID to each child student's UUID. (These IDs are visible in Supabase Auth Users and the students table.)
-4. Sign out and sign in again as the parent. The parent portal shows only linked children and their permitted attendance, results, and payment records.
+### 5. Parent and student portal setup
+1. Ask the parent/student to create an account using the website login form and confirm the email if enabled.
+2. Sign in as teacher/admin and open **Link Portal Accounts**.
+3. Choose Student or Parent, enter the exact sign-up email, select the matching student record, and link it. Parents can be linked to multiple children by repeating the process.
+4. Ask the user to sign out and back in. Their portal menu and data access will reflect the linked role.
+The account-linking database function checks teacher/admin permission and performs the role/link update atomically; no service-role key is needed in browser code.
 
 ### 6. Apply all commercial migrations
 After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
@@ -50,6 +50,7 @@ After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
 5. `006_notifications.sql`
 6. `007_multi_admin.sql`
 7. `008_certificate_access.sql`
+8. `009_portal_account_linking.sql`
 
 These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
 
