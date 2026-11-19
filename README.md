@@ -62,3 +62,12 @@ After running `supabase-schema.sql`, run `002_commercial_suite.sql` in Supabase 
 The extension provides database-backed teacher CRUD for the listed records and the public site sections. It does **not** yet implement every end-user workflow end-to-end: for example payment gateway checkout/webhooks, SMS/email/WhatsApp provider delivery, QR scanning, quiz-taking/auto-marking UI, file storage upload, parent self-service onboarding, calendar integrations, and production-grade PDF/Excel reporting still require dedicated implementation and provider credentials. Do not market these as active until completed and tested.
 
 Use Supabase Storage buckets and signed URLs for private student files. Configure payment providers only through secure server-side functions; never put secret keys in browser code. Review all RLS policies with test student, parent and teacher accounts before accepting real student records.
+
+
+## Selling and handing over this website
+
+This codebase is currently a **dedicated single-teacher / single-institution website template**. For each customer, create a separate customer-owned GitHub repository (or transfer repository ownership), Netlify site, and Supabase project. Do not use one shared database for unrelated teachers: tenant isolation has not been implemented.
+
+Before describing it as production-ready or accepting a final handover, complete [SECURITY.md](SECURITY.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). In particular, configure the customer's own Supabase project, test RLS with separate teacher/student/parent accounts, configure email/auth settings, and verify the production deployment.
+
+The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checkout and webhooks, automated SMS/email/WhatsApp delivery, quiz-taking and auto-marking, QR attendance, private file uploads, parent self-service onboarding, and automated certificate/report generation are not implemented end-to-end. Quote these as future phases, not delivered features. A real customer installation also needs the teacher's verified content, prices, timetable, contact information, domain, and privacy notice.
