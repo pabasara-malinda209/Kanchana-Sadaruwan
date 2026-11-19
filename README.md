@@ -72,7 +72,14 @@ Deploy on Netlify and configure these **Netlify environment variables** (never a
 The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature and applies payment changes atomically. Active orders expire after 30 minutes to reduce duplicate charges. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
 
 ### 8. Notifications and additional administrators
-For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Configure `RESEND_API_KEY` and `EMAIL_FROM` for email; `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for SMS; and `WHATSAPP_ACCESS_TOKEN` plus `WHATSAPP_PHONE_NUMBER_ID` for WhatsApp Cloud API. For scheduled fee reminders, add parent email/phone details and record the consent source and tick only the matching consent boxes on the student record. The reminder function runs at 03:00 UTC (08:30 Sri Lanka time) on published Netlify deploys; it does not run on Deploy Previews. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
+Configure provider credentials in Netlify only:
+- Email: `RESEND_API_KEY`, `EMAIL_FROM`.
+- SMS: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`.
+- WhatsApp Cloud API: `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`.
+- Optional manual WhatsApp approved template: `WHATSAPP_MESSAGE_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANGUAGE`. Without a template, free-form WhatsApp messages are subject to Meta's customer-service window.
+- Scheduled WhatsApp fee reminders: `WHATSAPP_REMINDER_TEMPLATE_NAME` and `WHATSAPP_TEMPLATE_LANGUAGE`. The approved template must have four body placeholders in this order: invoice number, student name, amount, due date.
+
+For scheduled fee reminders, add parent email/phone details and record the consent source, then tick only the matching opt-in boxes on the student record. The reminder function runs at 03:00 UTC (08:30 Sri Lanka time) on published Netlify deploys; it does not run on Deploy Previews. Provider accounts, sender verification, consent, regional rules and approved message templates are the customer's responsibility.
 
 To add another trusted administrator, create their account, verify identity, then run `update public.profiles set role='admin' where id=(select id from auth.users where email='ADMIN_EMAIL_HERE');`. Never let a public sign-up choose the admin role.
 
