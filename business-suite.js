@@ -22,10 +22,20 @@
     ["referrals","Referrals","referrals",["referrer_student_id","referred_name","referred_phone","status","reward"],"Student referral tracking"],
     ["certificates","Certificates","certificates",["student_id","certificate_type","issued_on","certificate_url"],"Issue and track certificates"],
     ["guardians","Parent Links","guardian_students",["guardian_user_id","student_id","relationship"],"Connect parent accounts to children"],
-    ["settings","Website Settings","website_settings",["setting_key","setting_value","public"],"Editable website content and settings"]
+    ["settings","Website Settings","website_settings",["setting_key","setting_value","public"],"Editable website content and settings"],
+    ["invoices","Student Invoices","invoices",["student_id","invoice_number","description","amount","due_on","status"],"Create fee invoices and track unpaid balances"],
+    ["questions","Quiz Questions","quiz_questions",["quiz_id","question","question_type","options","answer_key","marks"],"Add questions and answer keys for published quizzes"]
   ];
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const label=s=>s.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
+  const numericFields=new Set(["amount","fee","capacity","grade","marks","rating","budget","discount_value","total_marks","monthly_salary","reward"]);
+  const booleanFields=new Set(["published","active","public"]);
+  function field(k){
+    const l=esc(label(k));
+    if(booleanFields.has(k))return '<label class="suite-check"><input type="hidden" name="'+esc(k)+'" value="false"><input type="checkbox" name="'+esc(k)+'" value="true"> '+l+'</label>';
+    const type=k.endsWith("_on")||k.endsWith("_date")?"date":k.endsWith("_at")?"datetime-local":k.endsWith("_time")?"time":k.includes("url")?"url":numericFields.has(k)?"number":"text";
+    return '<label>'+l+'<input name="'+esc(k)+'" type="'+type+'" '+(numericFields.has(k)?'step="any" min="0"':'')+'></label>';
+  }
   function inject(){
     const nav=$("#sideNav"); if(!nav||!$("#portal")||$("#portal").hidden||!nav.dataset.suiteReady||nav.dataset.suiteRole!=="teacher")return;
     if(nav.querySelector('[data-suite-menu]'))return;
@@ -38,10 +48,10 @@
     document.querySelectorAll("[data-page],[data-suite-module]").forEach(x=>x.classList.toggle("active",x.dataset.suiteModule===id));
     $("#pageTitle").textContent=m[1];
     if(!db){root.innerHTML='<div class="panel"><h3>'+esc(m[1])+'</h3><p>මෙම module එක සක්‍රීය කිරීමට Supabase credentials සහ 002_commercial_suite.sql migration එක අවශ්‍යයි.</p></div>';return}
-    root.innerHTML='<div class="panel"><div class="suite-panel-head"><div><h3>'+esc(m[1])+'</h3><p>'+esc(m[4])+'</p></div><button class="btn light" id="suiteRefresh">Refresh</button></div><form id="suiteAdd" class="suite-form">'+m[3].map(k=>'<label>'+esc(label(k))+'<input name="'+esc(k)+'" '+(k.includes("date")||k.endsWith("_on")?"type=date":k.includes("url")?"type=url":k==="amount"||k==="fee"||k==="capacity"||k==="grade"||k==="marks"||k==="rating"||k==="budget"||k==="discount_value"||k==="total_marks"||k==="monthly_salary"?"type=number":"type=text")+'></label>').join("")+'<button class="btn primary">Save Record</button></form><div class="suite-table-wrap"><table><thead><tr>'+m[3].map(k=>'<th>'+esc(label(k))+'</th>').join("")+'<th>Action</th></tr></thead><tbody id="suiteRows"><tr><td colspan="'+(m[3].length+1)+'">Loading…</td></tr></tbody></table></div></div>';
+    root.innerHTML='<div class="panel"><div class="suite-panel-head"><div><h3>'+esc(m[1])+'</h3><p>'+esc(m[4])+'</p></div><button class="btn light" id="suiteRefresh">Refresh</button></div><form id="suiteAdd" class="suite-form">'+m[3].map(field).join("")+'<button class="btn primary">Save Record</button></form><div class="suite-table-wrap"><table><thead><tr>'+m[3].map(k=>'<th>'+esc(label(k))+'</th>').join("")+'<th>Action</th></tr></thead><tbody id="suiteRows"><tr><td colspan="'+(m[3].length+1)+'">Loading…</td></tr></tbody></table></div></div>';
     const load=async()=>{const {data,error}=await db.from(m[2]).select("*").order("created_at",{ascending:false}).limit(200);const body=$("#suiteRows");if(error){body.innerHTML='<tr><td colspan="'+(m[3].length+1)+'">'+esc(error.message)+'</td></tr>';return}body.innerHTML=(data||[]).map(r=>'<tr>'+m[3].map(k=>'<td>'+esc(r[k])+'</td>').join("")+'<td><button class="suite-delete" data-id="'+esc(r.id)+'">Delete</button></td></tr>').join("")||'<tr><td colspan="'+(m[3].length+1)+'">No records yet.</td></tr>';body.querySelectorAll(".suite-delete").forEach(b=>b.onclick=async()=>{if(confirm("Delete this record?")){const {error}=await db.from(m[2]).delete().eq("id",b.dataset.id);if(error)alert(error.message);else load()}})};
     $("#suiteRefresh").onclick=load;
-    $("#suiteAdd").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));for(const k of Object.keys(v)){if(v[k]==="")delete v[k];else if(["amount","fee","capacity","grade","marks","rating","budget","discount_value","total_marks","monthly_salary"].includes(k))v[k]=Number(v[k]);else if(v[k]==="true"||v[k]==="false")v[k]=v[k]==="true"}const {error}=await db.from(m[2]).insert(v);if(error)alert(error.message);else{e.target.reset();load()}};load();
+    $("#suiteAdd").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));for(const k of Object.keys(v)){if(v[k]==="")delete v[k];else if(numericFields.has(k))v[k]=Number(v[k]);else if(booleanFields.has(k))v[k]=v[k]==="true"}const {error}=await db.from(m[2]).insert(v);if(error)alert(error.message);else{e.target.reset();load()}};load();
   }
   function init(){
     const nav=$("#sideNav");if(nav){nav.dataset.suiteReady="1";const obs=new MutationObserver(()=>inject());obs.observe(nav,{childList:true});inject()}
