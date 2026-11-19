@@ -17,7 +17,7 @@ exports.handler = async event => {
     const invRes=await fetch(url+"/rest/v1/invoices?id=eq."+encodeURIComponent(invoiceId)+"&select=id,invoice_number,description,amount,status,student_id",{headers:{apikey:anon,Authorization:"Bearer "+token}});
     const invoices=await invRes.json(), invoice=Array.isArray(invoices)?invoices[0]:null;
     if(!invRes.ok||!invoice) return json(404,{error:"Invoice not found or access denied"});
-    if(!["unpaid","part_paid"].includes(invoice.status)) return json(409,{error:"Invoice is not payable"});
+    if(invoice.status!=="unpaid") return json(409,{error:"Invoice is not payable"});
     const required=["first_name","last_name","phone","address","city","country"];
     for(const k of required) if(!String(body[k]||"").trim()) return json(400,{error:"Missing "+k.replace("_"," ")});
     const amount=Number(invoice.amount).toFixed(2),currency="LKR",orderId=crypto.randomUUID();
