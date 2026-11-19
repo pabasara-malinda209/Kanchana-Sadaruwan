@@ -41,8 +41,30 @@ Teacher creates student records in the protected database. To link a student log
 3. In the teacher portal, use **Parent Links** to connect the parent's Auth user UUID to each child student's UUID. (These IDs are visible in Supabase Auth Users and the students table.)
 4. Sign out and sign in again as the parent. The parent portal shows only linked children and their permitted attendance, results, and payment records.
 
-### 5. Deploy
-Connect this GitHub repository to Netlify or GitHub Pages. Publish the repository root. Re-deploy after updating files.
+### 6. Apply all commercial migrations
+After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
+1. `002_commercial_suite.sql`
+2. `003_workflows_security.sql`
+3. `004_payhere_payments.sql`
+4. `005_homework_uploads.sql`
+
+These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
+
+### 7. PayHere online payments (optional until merchant account is ready)
+Deploy on Netlify and configure these **Netlify environment variables** (never add them to GitHub or `config.js`):
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-side Netlify functions only)
+- `PAYHERE_MERCHANT_ID`
+- `PAYHERE_MERCHANT_SECRET`
+- `PAYHERE_MODE=sandbox` for testing; change to `live` only after merchant approval and successful sandbox tests
+- `PUBLIC_SITE_URL` (your HTTPS website URL)
+- Optional: `PAYHERE_RETURN_URL`, `PAYHERE_CANCEL_URL`, `PAYHERE_NOTIFY_URL`
+
+The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature before marking the invoice paid. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
+
+### 8. Deploy
+Connect this GitHub repository to Netlify. Publish the repository root; Netlify detects functions under `netlify/functions`. Set the production branch intentionally and configure the environment variables above. Re-deploy after updating files.
 
 ## Notes / current limitations
 - This repository contains the website UI and backend schema. The Supabase project, keys, teacher account promotion and hosting connection require the account owner to complete the steps above.
@@ -78,3 +100,15 @@ This codebase is currently a **dedicated single-teacher / single-institution web
 Before describing it as production-ready or accepting a final handover, complete [SECURITY.md](SECURITY.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). In particular, configure the customer's own Supabase project, test RLS with separate teacher/student/parent accounts, configure email/auth settings, and verify the production deployment.
 
 The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checkout and webhooks, automated SMS/email/WhatsApp delivery, quiz-taking and auto-marking, QR attendance, private file uploads, parent self-service onboarding, and automated certificate/report generation are not implemented end-to-end. Quote these as future phases, not delivered features. A real customer installation also needs the teacher's verified content, prices, timetable, contact information, domain, and privacy notice.
+
+
+## Workflow capabilities added in this branch
+- **Quizzes:** teachers create quiz and question records; learners see only published quizzes for their grade. Answer keys are returned only to server-side SQL functions, and scoring is calculated in the database.
+- **QR attendance:** teacher generates a one-time token valid for ten minutes; students scan the QR with a camera or enter the token. A token can only be redeemed once.
+- **Homework:** students upload private work to the `student-private` bucket; teachers can open short-lived signed links, mark work and give feedback. Parents can view linked-child submission status.
+- **Invoices and payments:** teachers create invoices; learners/parents see only invoices allowed by RLS. PayHere checkout and webhook functions are included but require the merchant credentials and sandbox validation above.
+- **Public updates:** published events and testimonials are loaded from Supabase into the public site.
+- **Audit trail:** selected student, payment and attendance changes are logged; the teacher dashboard can read the log only if the corresponding module is implemented.
+
+## Before you sell
+This is still a customer-installable template, not a shared SaaS product. Every teacher/customer must have a separate Supabase project and Netlify site. The payment integration requires a PayHere merchant account; automated email/SMS/WhatsApp delivery still needs provider-specific configuration and a sending workflow. Run every migration in a disposable Supabase project and test teacher, student, parent and signed-out sessions before real data is used.
