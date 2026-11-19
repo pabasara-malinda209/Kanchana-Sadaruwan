@@ -21,8 +21,9 @@ exports.handler = async event => {
     const required=["first_name","last_name","phone","address","city","country"];
     for(const k of required) if(!String(body[k]||"").trim()) return json(400,{error:"Missing "+k.replace("_"," ")});
     const amount=Number(invoice.amount).toFixed(2),currency="LKR",orderId=crypto.randomUUID();
+    await fetch(url+"/rest/v1/payment_transactions?invoice_id=eq."+encodeURIComponent(invoice.id)+"&status=in.(created,pending)&expires_at=lt."+encodeURIComponent(new Date().toISOString()),{method:"PATCH",headers:{apikey:service,Authorization:"Bearer "+service,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({status:"cancelled",updated_at:new Date().toISOString()})});
     const insert=await fetch(url+"/rest/v1/payment_transactions",{method:"POST",headers:{apikey:service,Authorization:"Bearer "+service,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({invoice_id:invoice.id,student_id:invoice.student_id,order_id:orderId,amount,currency,status:"created"})});
-    if(!insert.ok) return json(500,{error:"Could not create payment record"});
+    if(!insert.ok) return json(insert.status===409?409:500,{error:insert.status===409?"A checkout is already active for this invoice. Try again in 30 minutes.":"Could not create payment record"});
     const fields={
       merchant_id:merchant,return_url:env.PAYHERE_RETURN_URL||env.PUBLIC_SITE_URL,
       cancel_url:env.PAYHERE_CANCEL_URL||env.PUBLIC_SITE_URL,
