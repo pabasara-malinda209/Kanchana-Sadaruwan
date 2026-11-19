@@ -51,6 +51,7 @@ jobs:
           test -s 009_portal_account_linking.sql
           test -s 010_payhere_atomic_webhook.sql
           test -s 011_scheduled_reminders.sql
+          test -s 012_profile_privilege_hardening.sql
           test -s calendar.js
           test -s netlify/functions/daily-fee-reminders.js
           test -s netlify/functions/payhere-checkout.js
