@@ -64,10 +64,11 @@
  }
  async function renderQrStudent(){
   panel("Scan Attendance QR",'<p>Allow camera access and scan the teacher’s current QR code. If camera scanning is unavailable, enter the token manually.</p><div id="reader" style="max-width:420px"></div><form id="tokenForm"><label>QR token<input name="token" required autocomplete="off"></label><button class="btn primary">Submit attendance</button></form><p id="qrMsg" class="message"></p>');
-  $("#tokenForm").onsubmit=async e=>{e.preventDefault();try{const v=await redeem(new FormData(e.target).get("token"));$("#qrMsg").textContent="Attendance recorded successfully."}catch(err){$("#qrMsg").textContent=err.message}};
+  $("#tokenForm").onsubmit=async e=>{e.preventDefault();try{if(scanner){try{await scanner.stop()}catch(err){}scanner=null}const v=await redeem(new FormData(e.target).get("token"));$("#qrMsg").textContent="Attendance recorded successfully."}catch(err){$("#qrMsg").textContent=err.message}};
   if(window.Html5Qrcode){try{scanner=new Html5Qrcode("reader");await scanner.start({facingMode:"environment"},{fps:10,qrbox:220},async decoded=>{try{await scanner.stop();scanner=null;await redeem(decoded);$("#qrMsg").textContent="Attendance recorded successfully."}catch(err){$("#qrMsg").textContent=err.message}})}catch(err){$("#qrMsg").textContent="Camera unavailable. Use the token field below."}}
  }
  async function route(id){
+  if(scanner&&id!=="scan-qr"){try{await scanner.stop()}catch(e){}scanner=null}
   if(!db){panel("Backend setup required","<p>Configure Supabase before using portal workflows.</p>");return}
   if(!await session()){panel("Please sign in","<p>Your session has expired. Sign in again.</p>");return}
   if(id==="quizzes")return renderQuizzes();
