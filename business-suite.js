@@ -27,7 +27,7 @@
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const label=s=>s.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
   function inject(){
-    const nav=$("#sideNav"); if(!nav||!$("#portal")||$("#portal").hidden||!nav.dataset.suiteReady)return;
+    const nav=$("#sideNav"); if(!nav||!$("#portal")||$("#portal").hidden||!nav.dataset.suiteReady||nav.dataset.suiteRole!=="teacher")return;
     if(nav.querySelector('[data-suite-menu]'))return;
     const head=document.createElement("div");head.className="suite-nav-heading";head.textContent="BUSINESS SUITE";head.dataset.suiteMenu="1";nav.append(head);
     modules.forEach(m=>{const b=document.createElement("button");b.type="button";b.textContent=m[1];b.dataset.suiteModule=m[0];b.onclick=()=>render(m[0]);nav.append(b)});
