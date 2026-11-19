@@ -30,7 +30,7 @@ exports.handler=async event=>{
    const out=await res.json();if(!res.ok)failure=out.message||"SMS provider error";else providerId=out.sid||"";
   }else{
    if(!env.WHATSAPP_ACCESS_TOKEN||!env.WHATSAPP_PHONE_NUMBER_ID)return json(503,{error:"Configure WhatsApp Cloud API credentials"});
-   const res=await fetch("https://graph.facebook.com/v20.0/"+env.WHATSAPP_PHONE_NUMBER_ID+"/messages",{method:"POST",headers:{Authorization:"Bearer "+env.WHATSAPP_ACCESS_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:recipient,type:"text",text:{body}})});
+   const res=await fetch("https://graph.facebook.com/v22.0/"+env.WHATSAPP_PHONE_NUMBER_ID+"/messages",{method:"POST",headers:{Authorization:"Bearer "+env.WHATSAPP_ACCESS_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:recipient,type:"text",text:{body}})});
    const out=await res.json();if(!res.ok)failure=out.error?.message||"WhatsApp provider error";else providerId=out.messages?.[0]?.id||"";
   }
   await fetch(url+"/rest/v1/notification_logs",{method:"POST",headers:{apikey:service,Authorization:"Bearer "+service,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({actor_user_id:user.id,channel,recipient,subject,body_preview:body.slice(0,240),provider_message_id:providerId||null,status:failure?"failed":"sent",error_message:failure||null})});
