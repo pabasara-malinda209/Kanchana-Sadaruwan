@@ -110,6 +110,7 @@ Do not claim any external integration is live until the customer's own credentia
 - **Invoices and payments:** teachers create invoices; learners/parents see only invoices allowed by RLS. PayHere checkout and webhook functions are included but require the merchant credentials and sandbox validation above.
 - **Public updates:** published events and testimonials are loaded from Supabase into the public site.
 - **Certificates:** teachers issue and print certificates; students and linked parents can view and print them (browser print-to-PDF).
+- **Student ID cards:** teachers, students and linked parents can print student ID cards from linked student records.
 - **Financial reporting:** dashboard totals recorded income and expenses and calculates net cash.
 - **PWA:** installable application manifest and a cached static app shell for quicker repeat loads. Authenticated workflows still require an internet connection.
 - **Exports:** teacher business-suite tables can be exported as CSV.
