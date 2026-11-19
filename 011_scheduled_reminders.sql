@@ -26,6 +26,25 @@ returns trigger language plpgsql set search_path=public as $$
 begin
  if coalesce(new.email_opt_in,false) or coalesce(new.sms_opt_in,false) or coalesce(new.whatsapp_opt_in,false) then
   if length(trim(coalesce(new.consent_source,'')))=0 then raise exception 'Record the source of parent notification consent before enabling reminders.'; end if;
+  if new.email_opt_in and length(trim(coalesce(new.parent_email,'')))=0 then raise exception 'Parent email is required for email reminders.'; end if;
+  if (new.sms_opt_in or new.whatsapp_opt_in) and coalesce(new.parent_phone,'') !~ '^\\+[1-9][0-9]{7,14}
+  if tg_op='INSERT' then
+    new.notification_consent_recorded_at=now();
+  elsif new.email_opt_in is distinct from old.email_opt_in or
+     new.sms_opt_in is distinct from old.sms_opt_in or
+     new.whatsapp_opt_in is distinct from old.whatsapp_opt_in or
+     new.consent_source is distinct from old.consent_source then
+    new.notification_consent_recorded_at=now();
+  end if;
+ else
+  new.notification_consent_recorded_at=null;
+ end if;
+ return new;
+end; $$;
+drop trigger if exists student_notification_consent_audit on public.students;
+create trigger student_notification_consent_audit before insert or update on public.students
+for each row execute function public.record_student_notification_consent();
+ then raise exception 'Use an international +countrycode phone number for SMS/WhatsApp reminders.'; end if;
   if tg_op='INSERT' then
     new.notification_consent_recorded_at=now();
   elsif new.email_opt_in is distinct from old.email_opt_in or
