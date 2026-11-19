@@ -38,6 +38,8 @@ jobs:
           test -s 005_homework_uploads.sql
           test -s 006_notifications.sql
           test -s 007_multi_admin.sql
+          test -s 008_certificate_access.sql
+          test -s certificates.js
           test -s notifications.js
           test -s netlify/functions/send-notification.js
           test -s netlify/functions/payhere-checkout.js
