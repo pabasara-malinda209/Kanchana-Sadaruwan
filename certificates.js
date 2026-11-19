@@ -5,8 +5,8 @@
  const db=ok&&window.supabase?window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY):null;
  async function session(){const {data}=await db.auth.getSession();return data.session}
  function show(title,html){$("#pageTitle").textContent=title;$("#dashboardContent").innerHTML='<div class="panel"><h3>'+esc(title)+'</h3>'+html+'</div>'}
- function printCertificate(student,type,date){
-  const w=window.open("","_blank");if(!w){alert("Please allow pop-ups to print the certificate.");return}
+ function printCertificate(student,type,date,target){
+  const w=target||window.open("","_blank");if(!w){alert("Please allow pop-ups to print the certificate.");return}
   w.document.write('<!doctype html><html><head><title>Certificate</title><style>body{font-family:Georgia,serif;background:#f5f2e9;padding:50px}.cert{border:12px double #18356f;background:white;min-height:520px;text-align:center;padding:60px 35px;display:flex;flex-direction:column;justify-content:center}.kicker{letter-spacing:5px;color:#9a7935}.name{font-size:42px;color:#18356f;margin:35px}.type{font-size:25px}.date{margin-top:55px} @media print{body{padding:0;background:white}.cert{min-height:90vh}}</style></head><body><main class="cert"><div class="kicker">KANCHANA SADARUWAN EDUCATION</div><h1>CERTIFICATE</h1><p>This certificate is proudly presented to</p><div class="name">'+esc(student)+'</div><div class="type">'+esc(type)+'</div><p>For dedication, participation and achievement.</p><div class="date">Issued on '+esc(date)+'</div></main><script>window.onload=()=>window.print()</script></body></html>');
   w.document.close();
  }
@@ -15,7 +15,7 @@
   const {data,error}=await db.from("students").select("id,full_name,grade").order("full_name");
   if(error){show("Issue Certificate","<p>"+esc(error.message)+"</p>");return}
   show("Issue Certificate",'<form id="certificateForm" class="suite-form"><label>Student<select name="student_id" required><option value="">Choose student</option>'+(data||[]).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.full_name)+' — Grade '+esc(s.grade)+'</option>').join("")+'</select></label><label>Certificate title<input name="certificate_type" required placeholder="Course Completion"></label><label>Issue date<input name="issued_on" type="date" value="'+new Date().toISOString().slice(0,10)+'" required></label><button class="btn primary">Issue & Print</button></form>');
-  $("#certificateForm").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));const student=(data||[]).find(s=>s.id===v.student_id);const {error}=await db.from("certificates").insert(v);if(error){alert(error.message);return}printCertificate(student?.full_name,v.certificate_type,v.issued_on)};
+  $("#certificateForm").onsubmit=async e=>{e.preventDefault();const win=window.open("","_blank");if(!win){alert("Please allow pop-ups to print the certificate.");return}const v=Object.fromEntries(new FormData(e.target));const student=(data||[]).find(s=>s.id===v.student_id);const {error}=await db.from("certificates").insert(v);if(error){win.close();alert(error.message);return}printCertificate(student?.full_name,v.certificate_type,v.issued_on,win)};
  }
  async function learnerPage(role){
   const ses=await session();let ids=[];
