@@ -34,6 +34,13 @@ The GitHub repository cannot create a private Supabase project or securely confi
 ### 4. Student accounts
 Teacher creates student records in the protected database. To link a student login, create their Auth account, then set the matching `students.auth_user_id` and `profiles.student_id` in Supabase. Do not share teacher login details with students.
 
+### 5. Parent portal setup
+1. Ask the parent to create an account using the website login form.
+2. In Supabase, promote that account to the `parent` role:
+   `update public.profiles set role='parent' where id=(select id from auth.users where email='PARENT_EMAIL_HERE');`
+3. In the teacher portal, use **Parent Links** to connect the parent's Auth user UUID to each child student's UUID. (These IDs are visible in Supabase Auth Users and the students table.)
+4. Sign out and sign in again as the parent. The parent portal shows only linked children and their permitted attendance, results, and payment records.
+
 ### 5. Deploy
 Connect this GitHub repository to Netlify or GitHub Pages. Publish the repository root. Re-deploy after updating files.
 
