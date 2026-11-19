@@ -12,14 +12,15 @@
   const {data:auth}=await db.auth.getSession();const role=$("#sideNav").dataset.suiteRole;let grades=[];
   if(role==="student"){const {data}=await db.from("students").select("grade").eq("auth_user_id",auth.session.user.id).maybeSingle();if(data)grades=[Number(data.grade)]}
   else if(role==="parent"){const {data:links}=await db.from("guardian_students").select("student_id").eq("guardian_user_id",auth.session.user.id);const ids=(links||[]).map(x=>x.student_id);if(ids.length){const {data}=await db.from("students").select("grade").in("id",ids);grades=[...new Set((data||[]).map(x=>Number(x.grade)))]}}
+  if(!["teacher","admin"].includes(role)&&!grades.length){alert("No linked student grade found.");return}
   const {data,error}=await db.from("timetable").select("grade,subject,medium,day_of_week,start_time,end_time,venue");
   if(error){alert(error.message);return}
-  const rows=(data||[]).filter(x=>!grades.length||grades.includes(Number(x.grade)));
+  const rows=(data||[]).filter(x=>["teacher","admin"].includes(role)||grades.includes(Number(x.grade)));
   const now=new Date(),stampNow=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
   const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Kanchana Sadaruwan Education//Timetable//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
   rows.forEach((r,index)=>{const day=dayMap[String(r.day_of_week||"").toLowerCase()];if(day===undefined)return;
    for(let week=0;week<8;week++){const date=new Date(now.getFullYear(),now.getMonth(),now.getDate()+((day-now.getDay()+7)%7)+week*7);if(date<new Date(now.getFullYear(),now.getMonth(),now.getDate()))continue;
-    lines.push("BEGIN:VEVENT","UID:"+index+"-"+week+"-"+date.getTime()+"@ks-education","DTSTAMP:"+stampNow,"DTSTART:"+stamp(date,r.start_time),"DTEND:"+stamp(date,r.end_time),"SUMMARY:"+ics("Grade "+r.grade+" "+r.subject+" class"),"DESCRIPTION:"+ics("Medium: "+(r.medium||"")+"\\nVenue: "+(r.venue||"")),"LOCATION:"+ics(r.venue||""),"END:VEVENT");
+    lines.push("BEGIN:VEVENT","UID:"+index+"-"+week+"-"+date.getTime()+"@ks-education","DTSTAMP:"+stampNow,"DTSTART:"+stamp(date,r.start_time),"DTEND:"+stamp(date,r.end_time),"SUMMARY:"+ics("Grade "+r.grade+" "+r.subject+" class"),"DESCRIPTION:"+ics("Medium: "+(r.medium||"")+"\nVenue: "+(r.venue||"")),"LOCATION:"+ics(r.venue||""),"END:VEVENT");
    }
   });
   lines.push("END:VCALENDAR");
