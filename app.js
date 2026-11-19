@@ -55,6 +55,7 @@
  function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
  $$("[data-grade]").forEach(b=>b.onclick=()=>{showModal("#regModal");$("#regForm [name=grade]").value=b.dataset.grade});
  $("#language").onchange=e=>{const l=e.target.value;document.documentElement.lang=l;const msg={si:"භාෂාව තෝරාගැනීම යාවත්කාලීන විය.",en:"Language preference selected.",ta:"மொழி தேர்ந்தெடுக்கப்பட்டது."};$("#language").title=msg[l]};
- if(sb)sb.auth.onAuthStateChange((_event,session)=>{if(session&&!user){user=session.user;setTimeout(loadSession,0)}});
+ $("#passwordForm").onsubmit=async e=>{e.preventDefault();const password=new FormData(e.target).get("password");const {error}=await sb.auth.updateUser({password});$("#passwordMsg").textContent=error?error.message:"Password updated successfully.";if(!error){e.target.reset();setTimeout(hideModals,900)}};
+ if(sb)sb.auth.onAuthStateChange((event,session)=>{if(event==="PASSWORD_RECOVERY")showModal("#passwordModal");if(session&&!user){user=session.user;setTimeout(loadSession,0)}});
  loadSession();
 })();
