@@ -45,6 +45,8 @@ drop policy if exists "students read own submissions" on public.submissions;
 create policy "students read own submissions" on public.submissions for select to authenticated using(exists(select 1 from public.students s where s.id=student_id and s.auth_user_id=auth.uid()));
 drop policy if exists "students submit own work" on public.submissions;
 create policy "students submit own work" on public.submissions for insert to authenticated with check(exists(select 1 from public.students s where s.id=student_id and s.auth_user_id=auth.uid()));
+drop policy if exists "parents read own guardian links" on public.guardian_students;
+create policy "parents read own guardian links" on public.guardian_students for select to authenticated using(guardian_user_id=auth.uid());
 drop policy if exists "parents read linked students" on public.students;
 create policy "parents read linked students" on public.students for select to authenticated using(exists(select 1 from public.guardian_students g where g.student_id=id and g.guardian_user_id=auth.uid()));
 drop policy if exists "parents read linked attendance" on public.attendance;
