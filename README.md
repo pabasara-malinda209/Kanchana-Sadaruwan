@@ -51,6 +51,7 @@ After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
 6. `007_multi_admin.sql`
 7. `008_certificate_access.sql`
 8. `009_portal_account_linking.sql`
+9. `010_payhere_atomic_webhook.sql`
 
 These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
 
@@ -65,7 +66,7 @@ Deploy on Netlify and configure these **Netlify environment variables** (never a
 - `PUBLIC_SITE_URL` (your HTTPS website URL)
 - Optional: `PAYHERE_RETURN_URL`, `PAYHERE_CANCEL_URL`, `PAYHERE_NOTIFY_URL`
 
-The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature before marking the invoice paid. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
+The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature and applies payment changes atomically. Active orders expire after 30 minutes to reduce duplicate charges. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
 
 ### 8. Notifications and additional administrators
 For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Configure `RESEND_API_KEY` and `EMAIL_FROM` for email; `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for SMS; and `WHATSAPP_ACCESS_TOKEN` plus `WHATSAPP_PHONE_NUMBER_ID` for WhatsApp Cloud API. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
