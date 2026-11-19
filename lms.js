@@ -7,7 +7,7 @@
  function addNav(){
   const nav=$("#sideNav"),portal=$("#portal");if(!nav||!portal||portal.hidden)return;
   const role=nav.dataset.suiteRole||"student";currentRole=role;
-  const items=role==="teacher"?[["attendance-qr","Create QR Attendance"],["inbox","Inbox"]]:role==="parent"?[["invoices","Children's Invoices"],["inbox","Inbox"]]:[["quizzes","Online Quizzes"],["scan-qr","Scan Attendance QR"],["invoices","My Invoices"],["inbox","Inbox"]];
+  const items=["teacher","admin"].includes(role)?[["attendance-qr","Create QR Attendance"],["inbox","Inbox"]]:role==="parent"?[["invoices","Children's Invoices"],["inbox","Inbox"]]:[["quizzes","Online Quizzes"],["scan-qr","Scan Attendance QR"],["invoices","My Invoices"],["inbox","Inbox"]];
   items.forEach(([id,label])=>{if(nav.querySelector('[data-lms-page="'+id+'"]'))return;const b=document.createElement("button");b.type="button";b.dataset.lmsPage=id;b.textContent=label;nav.append(b)});
  }
  async function session(){if(!db)return null;const {data}=await db.auth.getSession();return data.session}
