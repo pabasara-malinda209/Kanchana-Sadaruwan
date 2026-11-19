@@ -16,10 +16,12 @@ begin
  if p_mode='student' then
   select auth_user_id into existing_user from public.students where id=p_student_id for update;
   if existing_user is not null and existing_user<>target_id then raise exception 'This student already has a different login linked.'; end if;
+  delete from public.guardian_students where guardian_user_id=target_id;
   update public.students set auth_user_id=target_id where id=p_student_id;
   insert into public.profiles(id,role,student_id) values(target_id,'student',p_student_id)
   on conflict(id) do update set role='student',student_id=excluded.student_id;
  else
+  update public.students set auth_user_id=null where auth_user_id=target_id;
   insert into public.profiles(id,role,student_id) values(target_id,'parent',null)
   on conflict(id) do update set role='parent',student_id=null;
   insert into public.guardian_students(guardian_user_id,student_id,relationship)
