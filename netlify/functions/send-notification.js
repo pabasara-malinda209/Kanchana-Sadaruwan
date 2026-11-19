@@ -12,6 +12,8 @@ exports.handler=async event=>{
   const roleRes=await fetch(url+"/rest/v1/profiles?id=eq."+encodeURIComponent(user.id)+"&select=role",{headers:{apikey:service,Authorization:"Bearer "+service}});
   const roles=await roleRes.json();
   if(!roleRes.ok||!roles[0]||!["teacher","admin"].includes(roles[0].role))return json(403,{error:"Teacher permission required"});
+  const recent=await fetch(url+"/rest/v1/notification_logs?actor_user_id=eq."+encodeURIComponent(user.id)+"&created_at=gte."+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+"&select=id",{headers:{apikey:service,Authorization:"Bearer "+service}});
+  const recentRows=await recent.json();if(recent.ok&&Array.isArray(recentRows)&&recentRows.length>=30)return json(429,{error:"Hourly sending limit reached"});
   const input=JSON.parse(event.body||"{}"),channel=String(input.channel||"");
   const recipient=String(input.recipient||"").trim(),body=String(input.body||"").trim(),subject=String(input.subject||"Class update").trim();
   if(!["email","sms","whatsapp"].includes(channel)||!recipient||!body||body.length>3000)return json(400,{error:"Check channel, recipient and message"});
