@@ -17,6 +17,7 @@ The GitHub repository cannot create a private Supabase project or securely confi
 2. In the project, open **SQL Editor → New query**.
 3. Copy all of `supabase-schema.sql` from this repository into the editor and run it.
 4. Open **Project Settings → API** and copy the Project URL and the anon/public key (NOT the service_role/secret key).
+5. In **Authentication → URL Configuration**, add the customer's HTTPS Netlify URL and custom domain as allowed redirect URLs. Configure email confirmation and a verified SMTP sender before inviting students or parents.
 
 ### 2. Connect the website
 1. Open `config.js` in GitHub and edit it.
