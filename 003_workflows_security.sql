@@ -7,6 +7,9 @@ drop policy if exists "students read online sessions" on public.online_sessions;
 create policy "students read published online sessions" on public.online_sessions
 for select to authenticated using(published=true);
 
+alter table public.guardian_students add column if not exists created_at timestamptz not null default now();
+alter table public.website_settings add column if not exists created_at timestamptz not null default now();
+
 -- Parent/student invoice ledger. This is a record of charges, not a payment gateway.
 create table if not exists public.invoices(
  id uuid primary key default gen_random_uuid(),
