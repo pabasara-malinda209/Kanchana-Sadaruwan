@@ -12,7 +12,7 @@ async function send(channel,student,invoice,env){
   const res=await fetch("https://api.twilio.com/2010-04-01/Accounts/"+env.TWILIO_ACCOUNT_SID+"/Messages.json",{method:"POST",headers:{Authorization:"Basic "+auth,"Content-Type":"application/x-www-form-urlencoded"},body:form});
   const out=await res.json();if(!res.ok)throw new Error(out.message||"SMS provider failed");return out.sid||null;
  }
- const res=await fetch("https://graph.facebook.com/v22.0/"+env.WHATSAPP_PHONE_NUMBER_ID+"/messages",{method:"POST",headers:{Authorization:"Bearer "+env.WHATSAPP_ACCESS_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:student.parent_phone,type:"text",text:{body:message}})});
+ const res=await fetch("https://graph.facebook.com/v22.0/"+env.WHATSAPP_PHONE_NUMBER_ID+"/messages",{method:"POST",headers:{Authorization:"Bearer "+env.WHATSAPP_ACCESS_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:student.parent_phone,type:"template",template:{name:env.WHATSAPP_REMINDER_TEMPLATE_NAME,language:{code:env.WHATSAPP_TEMPLATE_LANGUAGE},components:[{type:"body",parameters:[{type:"text",text:invoice.invoice_number},{type:"text",text:student.full_name},{type:"text",text:Number(invoice.amount).toLocaleString("en-LK")},{type:"text",text:invoice.due_on}]}]}})});
  const out=await res.json();if(!res.ok)throw new Error(out.error?.message||"WhatsApp provider failed");return out.messages?.[0]?.id||null;
 }
 exports.handler=async()=>{
@@ -29,7 +29,7 @@ exports.handler=async()=>{
    const channels=[
     ["email",student.email_opt_in&&student.parent_email&&env.RESEND_API_KEY&&env.EMAIL_FROM],
     ["sms",student.sms_opt_in&&student.parent_phone&&env.TWILIO_ACCOUNT_SID&&env.TWILIO_AUTH_TOKEN&&env.TWILIO_FROM_NUMBER],
-    ["whatsapp",student.whatsapp_opt_in&&student.parent_phone&&env.WHATSAPP_ACCESS_TOKEN&&env.WHATSAPP_PHONE_NUMBER_ID]
+    ["whatsapp",student.whatsapp_opt_in&&student.parent_phone&&env.WHATSAPP_ACCESS_TOKEN&&env.WHATSAPP_PHONE_NUMBER_ID&&env.WHATSAPP_REMINDER_TEMPLATE_NAME&&env.WHATSAPP_TEMPLATE_LANGUAGE]
    ];
    await Promise.all(channels.map(async([channel,enabled])=>{
     if(!enabled)return;
