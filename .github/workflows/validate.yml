@@ -22,6 +22,8 @@ jobs:
           node --check config.js
           node --check lms.js
           node --check homework.js
+          node --check notifications.js
+          node --check netlify/functions/send-notification.js
           node --check public-feed.js
           node --check netlify/functions/payhere-checkout.js
           node --check netlify/functions/payhere-notify.js
@@ -34,5 +36,9 @@ jobs:
           test -s 003_workflows_security.sql
           test -s 004_payhere_payments.sql
           test -s 005_homework_uploads.sql
+          test -s 006_notifications.sql
+          test -s 007_multi_admin.sql
+          test -s notifications.js
+          test -s netlify/functions/send-notification.js
           test -s netlify/functions/payhere-checkout.js
           test -s netlify/functions/payhere-notify.js
