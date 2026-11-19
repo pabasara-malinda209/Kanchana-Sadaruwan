@@ -1,6 +1,8 @@
 -- Atomic, idempotent PayHere callback processing. Call only from trusted server-side code.
 alter table public.payment_transactions add column if not exists expires_at timestamptz not null default (now()+interval '30 minutes');
 update public.payment_transactions set status='cancelled' where status in ('created','pending') and expires_at<now();
+with ranked as (select id,row_number() over(partition by invoice_id order by created_at desc,id desc) as rn from public.payment_transactions where status in ('created','pending'))
+update public.payment_transactions p set status='cancelled',updated_at=now() from ranked r where p.id=r.id and r.rn>1;
 create unique index if not exists payment_one_active_per_invoice_idx on public.payment_transactions(invoice_id) where status in ('created','pending');
 create or replace function public.process_payhere_notification(
  p_order_id text,p_payment_id text,p_amount numeric,p_currency text,p_status_code text
