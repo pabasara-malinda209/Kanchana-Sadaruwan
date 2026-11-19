@@ -50,3 +50,5 @@
 .public-feed{margin-top:48px}
 .public-feed .heading{margin-bottom:20px}
 @media(max-width:560px){.assignment-upload,.mark-homework{grid-template-columns:1fr}.mark-homework>b,.mark-homework small{grid-column:auto}}
+
+.link-button{border:0;background:transparent;color:var(--blue);text-decoration:underline;padding:8px 0;font-size:13px;cursor:pointer}
