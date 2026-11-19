@@ -59,7 +59,7 @@
       const a=document.createElement("a");a.href=url;a.download=m[0]+"-export.csv";a.click();URL.revokeObjectURL(url);
     };
     $("#suiteRefresh").onclick=load;
-    $("#suiteAdd").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));for(const k of Object.keys(v)){if(v[k]==="")delete v[k];else if(numericFields.has(k))v[k]=Number(v[k]);else if(booleanFields.has(k))v[k]=v[k]==="true"}const {error}=await db.from(m[2]).insert(v);if(error)alert(error.message);else{e.target.reset();load()}};load();
+    $("#suiteAdd").onsubmit=async e=>{e.preventDefault();const v=Object.fromEntries(new FormData(e.target));for(const k of Object.keys(v)){if(v[k]==="")delete v[k];else if(numericFields.has(k))v[k]=Number(v[k]);else if(booleanFields.has(k))v[k]=v[k]==="true";else if(k==="options"||k==="setting_value"){try{v[k]=JSON.parse(v[k])}catch{alert(label(k)+" must be valid JSON.");return}}}const {error}=await db.from(m[2]).insert(v);if(error)alert(error.message);else{e.target.reset();load()}};load();
   }
   function init(){
     const nav=$("#sideNav");if(nav){nav.dataset.suiteReady="1";const obs=new MutationObserver(()=>inject());obs.observe(nav,{childList:true});inject()}
