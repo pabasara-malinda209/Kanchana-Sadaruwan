@@ -33,6 +33,12 @@ jobs:
           node --check pwa.js
           node --check portal-accounts.js
           node --check id-cards.js
+          node --check language.js
+          node --check certificates.js
+          node --check admin-tools.js
+          node --check pwa.js
+          node --check portal-accounts.js
+          node --check id-cards.js
       - name: Check required deployment files
         run: |
           test -s index.html
@@ -46,6 +52,10 @@ jobs:
           test -s 007_multi_admin.sql
           test -s 008_certificate_access.sql
           test -s 009_portal_account_linking.sql
+          test -s 010_payhere_atomic_webhook.sql
+          test -s _headers
+          test -s robots.txt
+          test -s sitemap.xml
           test -s _headers
           test -s robots.txt
           test -s sitemap.xml
