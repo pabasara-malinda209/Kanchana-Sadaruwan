@@ -41,6 +41,7 @@ jobs:
           test -s 008_certificate_access.sql
           test -s 009_portal_account_linking.sql
           test -s portal-accounts.js
+          test -s id-cards.js
           test -s certificates.js
           test -s admin-tools.js
           test -s sw.js
