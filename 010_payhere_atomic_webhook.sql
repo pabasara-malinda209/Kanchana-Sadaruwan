@@ -15,8 +15,8 @@ begin
  if tx.id is null then raise exception 'Unknown payment order.'; end if;
  if round(tx.amount,2)<>round(p_amount,2) or tx.currency<>p_currency then raise exception 'Payment amount or currency mismatch.'; end if;
  if tx.status='success' then return false; end if;
- if tx.status in ('created','pending') and tx.expires_at<now() then
-  update public.payment_transactions set status='cancelled',updated_at=now() where id=tx.id;
+ if tx.expires_at<now() then
+  if tx.status in ('created','pending') then update public.payment_transactions set status='cancelled',updated_at=now() where id=tx.id; end if;
   raise exception 'Payment order expired. Please create a new checkout.';
  end if;
  update public.payment_transactions set status=new_status,gateway_payment_id=p_payment_id,updated_at=now() where id=tx.id;
