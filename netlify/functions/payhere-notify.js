@@ -16,8 +16,10 @@ exports.handler=async event=>{
   if(Number(v.payhere_amount).toFixed(2)!==Number(tx.amount).toFixed(2)||v.payhere_currency!==tx.currency)return reply(400,"Amount mismatch");
   const success=v.status_code==="2";
   const status=success?"success":v.status_code==="-1"?"cancelled":"failed";
-  await fetch(url+"/rest/v1/payment_transactions?order_id=eq."+encodeURIComponent(v.order_id),{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({status,gateway_payment_id:v.payment_id||null,updated_at:new Date().toISOString()})});
-  if(success&&tx.status!=="success"){
+  const update=await fetch(url+"/rest/v1/payment_transactions?order_id=eq."+encodeURIComponent(v.order_id)+"&status=neq.success&select=id",{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({status,gateway_payment_id:v.payment_id||null,updated_at:new Date().toISOString()})});
+  if(!update.ok)return reply(500,"Could not update payment record");
+  const changed=await update.json();
+  if(success&&Array.isArray(changed)&&changed.length>0){
    await fetch(url+"/rest/v1/invoices?id=eq."+encodeURIComponent(tx.invoice_id),{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({status:"paid"})});
    await fetch(url+"/rest/v1/payments",{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({student_id:tx.student_id,amount:tx.amount,paid_on:new Date().toISOString().slice(0,10),month:new Date().toISOString().slice(0,7),note:"PayHere payment "+v.payment_id})});
   }
