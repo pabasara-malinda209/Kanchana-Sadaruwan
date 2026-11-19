@@ -1,0 +1,13 @@
+{
+  "name": "Kanchana Sadaruwan Education",
+  "short_name": "KS Education",
+  "description": "Learning portal for students, parents and teachers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f9fe",
+  "theme_color": "#102a70",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
