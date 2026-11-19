@@ -9,6 +9,8 @@ Use this for each customer installation. Keep customer credentials in the custom
 - [ ] Demonstrate the public website and teacher dashboard using test data.
 - [ ] Demonstrate quiz scoring, private homework upload/review, QR attendance, invoices, certificate printing, exports, and portal account linking with test accounts.
 - [ ] Test PayHere sandbox checkout/webhook and each configured email/SMS/WhatsApp provider. Do not enable live payments until merchant approval and successful reconciliation.
+- [ ] Confirm recorded email/SMS/WhatsApp consent before enabling scheduled fee reminders; test a reminder with a test invoice and confirm duplicate sends are prevented.
+- [ ] Import the timetable `.ics` file into the customer's calendar app and confirm dates/times.
 
 ## Customer configuration
 - [ ] Create a dedicated Supabase project in the customer's account.
