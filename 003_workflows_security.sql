@@ -44,6 +44,7 @@ begin
  select s.id into sid from public.students s where s.auth_user_id=auth.uid();
  if sid is null then raise exception 'Student account is not linked.'; end if;
  if not exists(select 1 from public.quizzes q where q.id=p_quiz_id and q.published=true
+   and (q.grade is null or q.grade=(select grade from public.students where id=sid))
    and (q.opens_at is null or q.opens_at<=now()) and (q.closes_at is null or q.closes_at>=now())) then
    raise exception 'Quiz is not available.';
  end if;
@@ -61,7 +62,7 @@ declare sid uuid; qcount integer; earned numeric; possible numeric; new_attempt 
 begin
  select s.id into sid from public.students s where s.auth_user_id=auth.uid();
  if sid is null then raise exception 'Student account is not linked.'; end if;
- if jsonb_typeof(p_answers)<>'object' then raise exception 'Answers must be an object.'; end if;
+ if coalesce(jsonb_typeof(p_answers),'')<>'object' then raise exception 'Answers must be an object.'; end if;
  if not exists(select 1 from public.quizzes q where q.id=p_quiz_id and q.published=true
    and (q.opens_at is null or q.opens_at<=now()) and (q.closes_at is null or q.closes_at>=now())) then
    raise exception 'Quiz is not available.';
@@ -98,6 +99,7 @@ alter table public.attendance_qr_tokens enable row level security;
 drop policy if exists "teacher manage attendance qr tokens" on public.attendance_qr_tokens;
 create policy "teacher manage attendance qr tokens" on public.attendance_qr_tokens
 for all to authenticated using(public.is_teacher()) with check(public.is_teacher());
+delete from public.attendance a using public.attendance b where a.student_id=b.student_id and a.class_date=b.class_date and a.ctid<b.ctid;
 create unique index if not exists attendance_one_per_day_idx on public.attendance(student_id,class_date);
 create or replace function public.create_attendance_qr_token(p_class_date date default current_date)
 returns text language plpgsql security definer set search_path=public as $$
