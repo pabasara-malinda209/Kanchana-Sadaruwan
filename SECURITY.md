@@ -14,7 +14,7 @@ This repository is a single-institution deployment template. Deploy a separate N
 ## Required pre-launch checks
 1. Run both SQL files in order in a fresh Supabase project.
 2. Run Supabase Security Advisor and resolve every relevant error/warning. Confirm RLS is enabled on every exposed table.
-3. Test with separate teacher, student, parent, and signed-out sessions. Verify each role can read only its permitted records and cannot change another user's records.
+3. Test with separate teacher, admin, student, parent, and signed-out sessions. Verify teacher accounts cannot update `profiles.role` directly; promote administrators only through trusted SQL. Verify each role can read only its permitted records and cannot change another user's records.
 4. Confirm public registration accepts valid input and rejects invalid input. Add rate limiting / bot protection before advertising publicly.
 5. Confirm email confirmation, password reset, SMTP sender, redirect URLs, and allowed origins are configured.
 6. Review the public site for real teacher identity, contact details, prices, venues, schedules, permissions for testimonials/photos, and privacy notice.
