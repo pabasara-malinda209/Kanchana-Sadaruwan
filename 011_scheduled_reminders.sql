@@ -11,6 +11,7 @@ create table if not exists public.reminder_logs(
  reminder_date date not null default current_date,
  status text not null default 'pending' check(status in ('pending','sent','failed','skipped')),
  error_message text,
+ provider_message_id text,
  created_at timestamptz not null default now(),
  unique(invoice_id,channel,reminder_date)
 );
