@@ -23,7 +23,7 @@ This repository is a single-institution deployment template. Deploy a separate N
 9. Verify the deployed commit and preview before publishing to the production branch.
 
 ## Current scope boundary
-The repository includes a public information site, registration request intake, Supabase-backed core records, and teacher CRUD screens for the commercial extension. It does not currently provide end-to-end payment checkout/webhooks, outbound SMS/email/WhatsApp delivery, quiz-taking/autograding, private file upload workflows, parent self-service onboarding, QR attendance, or production-grade reports/certificate generation. These must be implemented and tested before they are sold as included features.
+The repository includes public pages, registration intake, teacher/admin CRUD, parent/student account linking, database-scored quizzes, private assignment uploads, QR attendance tokens, invoices, PayHere server functions, provider-backed notification functions, certificate printing, CSV exports and an audit view. These are implementation paths, not a certification of live service: configure provider accounts and secrets in Netlify, apply migrations, and complete the acceptance tests before selling them as operational.
 
 ## Incident response
 If a key is exposed, rotate it immediately in the provider dashboard, remove it from Git history where appropriate, redeploy, and review access logs. If student/parent data is exposed, stop public access, preserve evidence, notify the responsible institution, and follow applicable privacy and legal obligations.
