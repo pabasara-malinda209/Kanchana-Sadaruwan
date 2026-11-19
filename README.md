@@ -53,6 +53,7 @@ After `supabase-schema.sql`, run these files in order in Supabase SQL Editor:
 8. `009_portal_account_linking.sql`
 9. `010_payhere_atomic_webhook.sql`
 10. `011_scheduled_reminders.sql`
+11. `012_profile_privilege_hardening.sql`
 
 These migrations add teacher business modules, parent links, server-marked quizzes, invoices, short-lived QR attendance, private student file storage, assignment submissions, and payment transaction records. Apply them to a fresh test project first and review the SQL before production.
 
@@ -70,7 +71,7 @@ Deploy on Netlify and configure these **Netlify environment variables** (never a
 The checkout function verifies the signed-in user and invoice access; the webhook verifies PayHere’s signature and applies payment changes atomically. Active orders expire after 30 minutes to reduce duplicate charges. Use PayHere sandbox transactions and reconcile test callbacks before enabling live mode. Never expose the service-role key or merchant secret to browser code.
 
 ### 8. Notifications and additional administrators
-For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Configure `RESEND_API_KEY` and `EMAIL_FROM` for email; `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for SMS; and `WHATSAPP_ACCESS_TOKEN` plus `WHATSAPP_PHONE_NUMBER_ID` for WhatsApp Cloud API. For scheduled fee reminders, add parent email/phone details and tick the matching consent boxes on the student record. The reminder function runs at 03:00 UTC (08:30 Sri Lanka time) on published Netlify deploys; it does not run on Deploy Previews. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
+For email notifications configure `RESEND_API_KEY` and `EMAIL_FROM` in Netlify. For SMS configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. For WhatsApp Cloud API configure `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`. The teacher-only notification screen sends through the selected provider and stores a delivery log. Configure `RESEND_API_KEY` and `EMAIL_FROM` for email; `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for SMS; and `WHATSAPP_ACCESS_TOKEN` plus `WHATSAPP_PHONE_NUMBER_ID` for WhatsApp Cloud API. For scheduled fee reminders, add parent email/phone details and record the consent source and tick only the matching consent boxes on the student record. The reminder function runs at 03:00 UTC (08:30 Sri Lanka time) on published Netlify deploys; it does not run on Deploy Previews. Provider accounts, sender verification, consent, regional rules and message templates are the customer's responsibility. WhatsApp delivery is subject to Meta policy and opt-in.
 
 To add another trusted administrator, create their account, verify identity, then run `update public.profiles set role='admin' where id=(select id from auth.users where email='ADMIN_EMAIL_HERE');`. Never let a public sign-up choose the admin role.
 
