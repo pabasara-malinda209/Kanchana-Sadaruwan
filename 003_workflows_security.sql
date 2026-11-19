@@ -64,6 +64,7 @@ begin
  if sid is null then raise exception 'Student account is not linked.'; end if;
  if coalesce(jsonb_typeof(p_answers),'')<>'object' then raise exception 'Answers must be an object.'; end if;
  if not exists(select 1 from public.quizzes q where q.id=p_quiz_id and q.published=true
+   and (q.grade is null or q.grade=(select grade from public.students where id=sid))
    and (q.opens_at is null or q.opens_at<=now()) and (q.closes_at is null or q.closes_at>=now())) then
    raise exception 'Quiz is not available.';
  end if;
