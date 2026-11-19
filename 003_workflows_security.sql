@@ -54,6 +54,7 @@ end; $$;
 revoke all on function public.get_quiz_questions(uuid) from public;
 grant execute on function public.get_quiz_questions(uuid) to authenticated;
 
+delete from public.quiz_attempts a using public.quiz_attempts b where a.quiz_id=b.quiz_id and a.student_id=b.student_id and a.ctid>b.ctid;
 create unique index if not exists quiz_attempt_one_per_student_idx on public.quiz_attempts(quiz_id,student_id);
 create or replace function public.submit_quiz_attempt(p_quiz_id uuid,p_answers jsonb)
 returns table(attempt_id uuid,score numeric,total_marks numeric)
