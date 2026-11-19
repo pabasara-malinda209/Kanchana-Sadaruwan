@@ -18,7 +18,7 @@
  function fieldInput([name,label]){const type=name.includes("date")?"date":name.includes("time")?"time":name==="amount"||name==="grade"||name==="max_marks"?"number":"text";return '<label>'+label+'<input name="'+name+'" type="'+type+'" '+(name==="title"||name==="full_name"||name==="student_name"?"required":"")+'></label>'}
  async function getRows(def){
   let q=sb.from(def.table).select("*").order("created_at",{ascending:false}).limit(100);
-  if(profile.role!=="teacher"){
+  if(!["teacher","admin"].includes(profile.role)){
    let childIds=[];
    if(profile.role==="parent"){
     const links=await sb.from("guardian_students").select("student_id").eq("guardian_user_id",user.id);
