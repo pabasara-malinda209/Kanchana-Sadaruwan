@@ -118,6 +118,8 @@ The existing UI is not yet a complete all-in-one LMS/ERP. Payment gateway checko
 - **Public updates:** published events and testimonials are loaded from Supabase into the public site.
 - **Certificates:** teachers issue and print certificates; students and linked parents can view and print them (browser print-to-PDF).
 - **Financial reporting:** dashboard totals recorded income and expenses and calculates net cash.
+- **PWA:** installable application manifest and a cached static app shell for quicker repeat loads. Authenticated workflows still require an internet connection.
+- **Exports:** teacher business-suite tables can be exported as CSV.
 - **Audit trail:** selected student, payment and attendance changes are logged and visible in a read-only admin screen. A live system overview shows core record counts.
 
 ## Before you sell
