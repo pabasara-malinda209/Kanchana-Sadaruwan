@@ -58,7 +58,7 @@
     $("#suiteExport").onclick=async()=>{
       const {data,error}=await db.from(m[2]).select("*").order("created_at",{ascending:false}).limit(5000);
       if(error){alert(error.message);return}
-      const columns=m[3],cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+      const columns=m[3],cell=v=>{const raw=String(v??"");const safe=/^[\\s]*[=+\\-@]/.test(raw)?"'"+raw:raw;return '"'+safe.replace(/"/g,'""')+'"'};
       const csv=[columns.join(","),...(data||[]).map(row=>columns.map(k=>cell(row[k])).join(","))].join("\\r\\n");
       const url=URL.createObjectURL(new Blob(["\\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));
       const a=document.createElement("a");a.href=url;a.download=m[0]+"-export.csv";a.click();URL.revokeObjectURL(url);
