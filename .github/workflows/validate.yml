@@ -1,0 +1,67 @@
+name: Validate static site
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - commercial-platform-suite
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check business-suite.js
+          node --check config.js
+          node --check lms.js
+          node --check homework.js
+          node --check notifications.js
+          node --check language.js
+          node --check certificates.js
+          node --check admin-tools.js
+          node --check portal-accounts.js
+          node --check id-cards.js
+          node --check calendar.js
+          node --check netlify/functions/daily-fee-reminders.js
+          node --check public-feed.js
+          node --check pwa.js
+          node --check netlify/functions/payhere-checkout.js
+          node --check netlify/functions/payhere-notify.js
+          node --check netlify/functions/send-notification.js
+      - name: Check required release files
+        run: |
+          test -s index.html
+          test -s privacy.html
+          test -s terms.html
+          test -s style.css
+          test -s config.js
+          test -s supabase-schema.sql
+          test -s 002_commercial_suite.sql
+          test -s 003_workflows_security.sql
+          test -s 004_payhere_payments.sql
+          test -s 005_homework_uploads.sql
+          test -s 006_notifications.sql
+          test -s 007_multi_admin.sql
+          test -s 008_certificate_access.sql
+          test -s 009_portal_account_linking.sql
+          test -s 010_payhere_atomic_webhook.sql
+          test -s 011_scheduled_reminders.sql
+          test -s 012_profile_privilege_hardening.sql
+          test -s calendar.js
+          test -s netlify/functions/daily-fee-reminders.js
+          test -s netlify/functions/payhere-checkout.js
+          test -s netlify/functions/payhere-notify.js
+          test -s netlify/functions/send-notification.js
+          test -s manifest.webmanifest
+          test -s sw.js
+          test -s icon.svg
+          test -s _headers
+          test -s robots.txt
+          test -s sitemap.xml

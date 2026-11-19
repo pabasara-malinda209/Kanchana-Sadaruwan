@@ -1,0 +1,64 @@
+-- Commercial tuition business suite extension
+-- Run after supabase-schema.sql in Supabase SQL Editor.
+create extension if not exists pgcrypto;
+alter table public.profiles drop constraint if exists profiles_role_check;
+alter table public.profiles add constraint profiles_role_check check(role in ('teacher','student','parent'));
+create table if not exists public.leads(id uuid primary key default gen_random_uuid(),name text not null,phone text,email text,source text,interest text,stage text default 'new',follow_up_on date,created_at timestamptz default now());
+create table if not exists public.batches(id uuid primary key default gen_random_uuid(),batch_name text not null,grade int check(grade between 1 and 11),subject text,medium text,capacity int,venue text,fee numeric default 0,created_at timestamptz default now());
+create table if not exists public.class_sessions(id uuid primary key default gen_random_uuid(),batch_id uuid references public.batches(id) on delete set null,session_date date,start_time text,end_time text,topic text,meeting_url text,created_at timestamptz default now());
+create table if not exists public.staff(id uuid primary key default gen_random_uuid(),full_name text not null,role_title text,email text,phone text,monthly_salary numeric default 0,created_at timestamptz default now());
+create table if not exists public.expenses(id uuid primary key default gen_random_uuid(),category text,description text,amount numeric not null check(amount>=0),spent_on date default current_date,payment_method text,created_at timestamptz default now());
+create table if not exists public.assignments(id uuid primary key default gen_random_uuid(),title text not null,description text,grade int,subject text,due_on date,attachment_url text,published boolean default false,created_at timestamptz default now());
+create table if not exists public.submissions(id uuid primary key default gen_random_uuid(),assignment_id uuid references public.assignments(id) on delete cascade,student_id uuid references public.students(id) on delete cascade,submission_url text,marks numeric,feedback text,status text default 'submitted',created_at timestamptz default now());
+create table if not exists public.quizzes(id uuid primary key default gen_random_uuid(),title text not null,grade int,subject text,opens_at timestamptz,closes_at timestamptz,total_marks numeric default 0,published boolean default false,created_at timestamptz default now());
+create table if not exists public.quiz_questions(id uuid primary key default gen_random_uuid(),quiz_id uuid references public.quizzes(id) on delete cascade,question text not null,question_type text default 'mcq',options jsonb,answer_key text,marks numeric default 1,created_at timestamptz default now());
+create table if not exists public.quiz_attempts(id uuid primary key default gen_random_uuid(),quiz_id uuid references public.quizzes(id) on delete cascade,student_id uuid references public.students(id) on delete cascade,answers jsonb,score numeric,submitted_at timestamptz default now());
+create table if not exists public.online_sessions(id uuid primary key default gen_random_uuid(),title text not null,session_type text default 'live',grade int,subject text,starts_at timestamptz,meeting_url text,recording_url text,created_at timestamptz default now());
+create table if not exists public.messages(id uuid primary key default gen_random_uuid(),recipient_user_id uuid references auth.users(id) on delete cascade,subject text,body text not null,channel text default 'portal',sent_at timestamptz default now(),created_at timestamptz default now());
+create table if not exists public.events(id uuid primary key default gen_random_uuid(),title text not null,description text,event_date timestamptz,event_type text,venue text,published boolean default false,created_at timestamptz default now());
+create table if not exists public.testimonials(id uuid primary key default gen_random_uuid(),student_name text not null,grade text,quote text not null,rating int check(rating between 1 and 5),published boolean default false,created_at timestamptz default now());
+create table if not exists public.campaigns(id uuid primary key default gen_random_uuid(),name text not null,channel text,start_on date,end_on date,budget numeric default 0,status text default 'draft',created_at timestamptz default now());
+create table if not exists public.coupons(id uuid primary key default gen_random_uuid(),code text unique not null,discount_type text,discount_value numeric,valid_until date,active boolean default true,created_at timestamptz default now());
+create table if not exists public.referrals(id uuid primary key default gen_random_uuid(),referrer_student_id uuid references public.students(id) on delete set null,referred_name text,referred_phone text,status text default 'pending',reward numeric default 0,created_at timestamptz default now());
+create table if not exists public.certificates(id uuid primary key default gen_random_uuid(),student_id uuid references public.students(id) on delete cascade,certificate_type text,issued_on date default current_date,certificate_url text,created_at timestamptz default now());
+create table if not exists public.guardian_students(id uuid primary key default gen_random_uuid(),guardian_user_id uuid references auth.users(id) on delete cascade,student_id uuid references public.students(id) on delete cascade,relationship text,unique(guardian_user_id,student_id));
+create table if not exists public.website_settings(id uuid primary key default gen_random_uuid(),setting_key text unique not null,setting_value jsonb,public boolean default false,updated_at timestamptz default now());
+create table if not exists public.audit_logs(id uuid primary key default gen_random_uuid(),actor_user_id uuid references auth.users(id) on delete set null,action text not null,entity text,entity_id uuid,details jsonb,created_at timestamptz default now());
+-- Teacher-only management policies. All private data remains deny-by-default for students and anonymous visitors.
+do $$ declare t text; begin foreach t in array array['leads','batches','class_sessions','staff','expenses','assignments','submissions','quizzes','quiz_questions','quiz_attempts','online_sessions','messages','events','testimonials','campaigns','coupons','referrals','certificates','guardian_students','website_settings','audit_logs'] loop
+ execute format('alter table public.%I enable row level security',t);
+ execute format('drop policy if exists "teacher manage %I" on public.%I',t,t);
+ execute format('create policy "teacher manage %I" on public.%I for all to authenticated using(public.is_teacher()) with check(public.is_teacher())',t,t);
+end loop; end $$;
+-- Published catalogue content can be displayed publicly.
+drop policy if exists "public read published testimonials" on public.testimonials;
+create policy "public read published testimonials" on public.testimonials for select to anon,authenticated using(published=true);
+drop policy if exists "public read published events" on public.events;
+create policy "public read published events" on public.events for select to anon,authenticated using(published=true);
+drop policy if exists "public read published assignments" on public.assignments;
+create policy "students read published assignments" on public.assignments for select to authenticated using(published=true);
+drop policy if exists "students read published quizzes" on public.quizzes;
+create policy "students read published quizzes" on public.quizzes for select to authenticated using(published=true);
+drop policy if exists "students read online sessions" on public.online_sessions;
+create policy "students read online sessions" on public.online_sessions for select to authenticated using(true);
+drop policy if exists "students read own submissions" on public.submissions;
+create policy "students read own submissions" on public.submissions for select to authenticated using(exists(select 1 from public.students s where s.id=student_id and s.auth_user_id=auth.uid()));
+drop policy if exists "students submit own work" on public.submissions;
+create policy "students submit own work" on public.submissions for insert to authenticated with check(exists(select 1 from public.students s where s.id=student_id and s.auth_user_id=auth.uid()));
+drop policy if exists "parents read own guardian links" on public.guardian_students;
+create policy "parents read own guardian links" on public.guardian_students for select to authenticated using(guardian_user_id=auth.uid());
+drop policy if exists "parents read linked students" on public.students;
+create policy "parents read linked students" on public.students for select to authenticated using(exists(select 1 from public.guardian_students g where g.student_id=id and g.guardian_user_id=auth.uid()));
+drop policy if exists "parents read linked attendance" on public.attendance;
+create policy "parents read linked attendance" on public.attendance for select to authenticated using(exists(select 1 from public.guardian_students g where g.student_id=attendance.student_id and g.guardian_user_id=auth.uid()));
+drop policy if exists "parents read linked results" on public.results;
+create policy "parents read linked results" on public.results for select to authenticated using(exists(select 1 from public.guardian_students g where g.student_id=results.student_id and g.guardian_user_id=auth.uid()));
+drop policy if exists "parents read linked payments" on public.payments;
+create policy "parents read linked payments" on public.payments for select to authenticated using(exists(select 1 from public.guardian_students g where g.student_id=payments.student_id and g.guardian_user_id=auth.uid()));
+create index if not exists leads_stage_idx on public.leads(stage);
+create index if not exists batches_grade_idx on public.batches(grade);
+create index if not exists sessions_date_idx on public.class_sessions(session_date);
+create index if not exists expenses_date_idx on public.expenses(spent_on);
+create index if not exists submissions_student_idx on public.submissions(student_id);
+create index if not exists messages_recipient_idx on public.messages(recipient_user_id);
+create index if not exists guardian_students_guardian_idx on public.guardian_students(guardian_user_id);

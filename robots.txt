@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pskcjwixiwid.netlify.app/sitemap.xml

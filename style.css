@@ -24,3 +24,31 @@
  .heroimage{height:530px}
  .workspace{padding:46px}
 }
+\n/* Commercial platform suite */
+.suite-nav-heading{padding:18px 12px 5px;color:#8fa9dc;font-size:10px;font-weight:900;letter-spacing:1.5px}
+.suite-live{display:inline-flex;margin-left:12px;padding:5px 9px;border-radius:20px;background:#e9f1ff;color:#315db5;font-size:9px;font-weight:900;letter-spacing:1px;vertical-align:middle}
+.suite-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.suite-panel-head p{color:var(--muted);font-size:13px;margin:0 0 18px}
+.suite-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:18px;background:#f7f9fe;border:1px solid var(--line);border-radius:14px;margin:12px 0 20px}
+.suite-form label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#596782}.suite-form input{width:100%;min-width:0;padding:11px;border:1px solid #dce4f1;border-radius:9px;background:white}
+.suite-form .btn{align-self:end}.suite-table-wrap{overflow:auto}.suite-table-wrap table{min-width:700px}.suite-delete{border:0;background:#fff0f0;color:#b53a3a;padding:7px 10px;border-radius:8px;font-weight:700}
+@media(max-width:760px){.suite-form{grid-template-columns:1fr 1fr}.suite-panel-head{flex-direction:column}.suite-nav-heading{grid-column:1/-1}}
+@media(max-width:480px){.suite-form{grid-template-columns:1fr}}
+
+/* Extended learner and business workflow components */
+.suite-check{display:flex!important;align-items:center;gap:8px}.suite-check input{width:auto!important}
+.inbox-item,.assignment-card,.certificate-row{padding:16px 0;border-bottom:1px solid var(--line)}
+.inbox-item p,.assignment-card p{color:var(--muted);line-height:1.6}
+.assignment-upload{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-top:14px}
+.assignment-upload label,.mark-homework label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#596782}
+.assignment-upload input,.mark-homework input,.mark-homework textarea,.mark-homework select{width:100%;padding:10px;border:1px solid #dce4f1;border-radius:9px;background:white}
+.mark-homework{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:18px 0;border-bottom:1px solid var(--line)}
+.mark-homework>b,.mark-homework small{grid-column:1/-1}
+.mark-homework textarea{min-height:80px}
+.quiz-question{border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0}
+.quiz-question legend{font-weight:800;padding:0 6px}
+.quiz-option{display:block;padding:8px 0}
+.public-feed{margin-top:48px}
+.public-feed .heading{margin-bottom:20px}
+@media(max-width:560px){.assignment-upload,.mark-homework{grid-template-columns:1fr}.mark-homework>b,.mark-homework small{grid-column:auto}}
+
+.link-button{border:0;background:transparent;color:var(--blue);text-decoration:underline;padding:8px 0;font-size:13px;cursor:pointer}
