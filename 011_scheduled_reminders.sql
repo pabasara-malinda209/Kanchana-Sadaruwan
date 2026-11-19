@@ -26,8 +26,9 @@ returns trigger language plpgsql set search_path=public as $$
 begin
  if coalesce(new.email_opt_in,false) or coalesce(new.sms_opt_in,false) or coalesce(new.whatsapp_opt_in,false) then
   if length(trim(coalesce(new.consent_source,'')))=0 then raise exception 'Record the source of parent notification consent before enabling reminders.'; end if;
-  if tg_op='INSERT' or
-     new.email_opt_in is distinct from old.email_opt_in or
+  if tg_op='INSERT' then
+    new.notification_consent_recorded_at=now();
+  elsif new.email_opt_in is distinct from old.email_opt_in or
      new.sms_opt_in is distinct from old.sms_opt_in or
      new.whatsapp_opt_in is distinct from old.whatsapp_opt_in or
      new.consent_source is distinct from old.consent_source then
